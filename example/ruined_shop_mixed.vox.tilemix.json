@@ -1,0 +1,239 @@
+{
+  "schema_version": 2,
+  "source_vox": "C:\\Users\\PC\\Documents\\Personal Vault\\RC-survival Assets\\Tools\\VOX Tile Mixer\\example\\ruined_shop_mixed.vox",
+  "source_sha256": "20b3503e36de0b9c37453044a5b143f0a7dc068f2bd3992847f301daa57b84e9",
+  "original_folder": "C:\\Users\\PC\\Documents\\Personal Vault\\RC-survival Assets\\Tools\\VOX Tile Mixer\\example\\tiles",
+  "variant_folders": [
+    "C:\\Users\\PC\\Documents\\Personal Vault\\RC-survival Assets\\Tools\\VOX Tile Mixer\\example\\tiles_damaged_A",
+    "C:\\Users\\PC\\Documents\\Personal Vault\\RC-survival Assets\\Tools\\VOX Tile Mixer\\example\\tiles_damaged_B"
+  ],
+  "weights": {
+    "tiles_damaged_A": 0,
+    "tiles_damaged_B": 0
+  },
+  "seed": 42,
+  "links": {
+    "0|Structure_Floor": {
+      "family": "slab_full",
+      "reference_key": "tiles/slab_full",
+      "rotation": 0,
+      "source_geometry_sha256": "1974243596f4303c7c910d1095a69b8a3171cc30d72e394bda79f650ca6f8a70"
+    },
+    "0|Structure_Roof": {
+      "family": "slab_full",
+      "reference_key": "tiles/slab_full",
+      "rotation": 0,
+      "source_geometry_sha256": "1974243596f4303c7c910d1095a69b8a3171cc30d72e394bda79f650ca6f8a70"
+    },
+    "1|Terrain_Ground": {
+      "family": "terrain_ground",
+      "reference_key": "tiles/terrain_ground",
+      "rotation": 0,
+      "source_geometry_sha256": "bff3f5d47c7d6f71a6fc7841d8e2021dc649eacad74586847630d77ab70b7ca5"
+    },
+    "2|Terrain_Rock": {
+      "family": "terrain_rock",
+      "reference_key": "tiles/terrain_rock",
+      "rotation": 0,
+      "source_geometry_sha256": "44f5857d379373202cfbddf03421567269df120e06f8e75d57a301b718934b0e"
+    },
+    "3|Structure_Walls": {
+      "family": "wall_full",
+      "reference_key": "tiles/wall_full",
+      "rotation": 0,
+      "source_geometry_sha256": "9d79ac798924d2979cb32f35f9bc02947bb9a5ba7cc7b13d1a0d77f1533ea91f"
+    },
+    "4|Stair_Interior": {
+      "family": "stair_type_A",
+      "reference_key": "tiles/stair_type_A",
+      "rotation": 0,
+      "source_geometry_sha256": "bae86d88bf8657f1b834a8ba48a8399428ce57d73c2f45cf570b7671b8972e34"
+    },
+    "6|Internal_Walls": {
+      "family": "wall_interior_8h",
+      "reference_key": "tiles/wall_interior_8h",
+      "rotation": 0,
+      "source_geometry_sha256": "2e47e6f437216e515cd03339bbc0c1ee4c92f30151baaebefddc06d85f2f70cb"
+    },
+    "7|Internal_Walls": {
+      "family": "wall_full",
+      "reference_key": "tiles/wall_full",
+      "rotation": 1,
+      "source_geometry_sha256": "610baf115837d4c0294472e1f027a6bd9233b6b989de76f30f8e9b1c200a7601"
+    },
+    "7|Structure_Walls": {
+      "family": "wall_full",
+      "reference_key": "tiles/wall_full",
+      "rotation": 1,
+      "source_geometry_sha256": "610baf115837d4c0294472e1f027a6bd9233b6b989de76f30f8e9b1c200a7601"
+    },
+    "8|Internal_Walls": {
+      "family": "wall_corner_interior_l_8h",
+      "reference_key": "tiles/wall_corner_interior_l_8h",
+      "rotation": 0,
+      "source_geometry_sha256": "2000d46085ad9a2a01a0297869edddc002d58a22b955601228a8cf2b92308fd1"
+    },
+    "9|Structure_Openings": {
+      "family": "wall_opening_3x4",
+      "reference_key": "tiles/wall_opening_3x4",
+      "rotation": 0,
+      "source_geometry_sha256": "062c4a861432a37939ba29c1d54f25cea6f94fca30ebc08a6d2be54e01f38151"
+    },
+    "10|Internal_Walls": {
+      "family": "wall_corner_l",
+      "reference_key": "tiles/wall_corner_l",
+      "rotation": 0,
+      "source_geometry_sha256": "7ba9d5eda4b91437c0782754509acf518d3a797128108f47a85f4cd038a029ca"
+    },
+    "11|Structure_Walls": {
+      "family": "wall_full",
+      "reference_key": "tiles/wall_full",
+      "rotation": 1,
+      "source_geometry_sha256": "610baf115837d4c0294472e1f027a6bd9233b6b989de76f30f8e9b1c200a7601"
+    },
+    "12|Structure_Foundation": {
+      "family": "solid_cube",
+      "reference_key": "tiles/solid_cube",
+      "rotation": 0,
+      "source_geometry_sha256": "94d5353808a8bfd8b1b508fa993f156fb3ddf122e0605eecd2acc19b504a32f9"
+    },
+    "13|Landings": {
+      "family": "stair_landing_150",
+      "reference_key": "tiles/stair_landing_150",
+      "rotation": 0,
+      "source_geometry_sha256": "9817b0a386b47a7a0497ecc3d37ca38ba82c0d68391e70cb6cd16a387eb6ac31"
+    },
+    "14|Structure_Openings": {
+      "family": "wall_opening_3x4",
+      "reference_key": "tiles/wall_opening_3x4",
+      "rotation": 0,
+      "source_geometry_sha256": "062c4a861432a37939ba29c1d54f25cea6f94fca30ebc08a6d2be54e01f38151"
+    },
+    "15|Structure_Floor": {
+      "family": "slab_full",
+      "reference_key": "tiles/slab_full",
+      "rotation": 0,
+      "source_geometry_sha256": "9ee1c6fcb674c3d43d459701b329d353d6d7f3d36f26283fbb13401665c2ec7b"
+    },
+    "15|Structure_Roof": {
+      "family": "slab_full",
+      "reference_key": "tiles/slab_full",
+      "rotation": 0,
+      "source_geometry_sha256": "9ee1c6fcb674c3d43d459701b329d353d6d7f3d36f26283fbb13401665c2ec7b"
+    },
+    "16|Structure_Floor": {
+      "family": "slab_full",
+      "reference_key": "tiles/slab_full",
+      "rotation": 0,
+      "source_geometry_sha256": "27d51a473e25bcecc27b85177f3f477865f1b5a7ad58918d57a2efa9fdc9e150"
+    },
+    "16|Structure_Roof": {
+      "family": "slab_full",
+      "reference_key": "tiles/slab_full",
+      "rotation": 0,
+      "source_geometry_sha256": "27d51a473e25bcecc27b85177f3f477865f1b5a7ad58918d57a2efa9fdc9e150"
+    },
+    "17|Terrain_Ground": {
+      "family": "terrain_ground",
+      "reference_key": "tiles/terrain_ground",
+      "rotation": 0,
+      "source_geometry_sha256": "6a7bbb8fbf9ca388b1985ece1514e8842c319289778f1ff03b953a34889bea81"
+    },
+    "18|Terrain_Ground": {
+      "family": "terrain_ground",
+      "reference_key": "tiles/terrain_ground",
+      "rotation": 0,
+      "source_geometry_sha256": "01dfc235d195c8ea6de7f806416c24c7cbf603e81f25a430a58ec5477684c048"
+    },
+    "19|Structure_Walls": {
+      "family": "wall_full",
+      "reference_key": "tiles/wall_full",
+      "rotation": 0,
+      "source_geometry_sha256": "5b97f87926209fa69ebf75582ae19123d7ea31452304ab1fe04754e92d2168c7"
+    },
+    "20|Structure_Walls": {
+      "family": "wall_full",
+      "reference_key": "tiles/wall_full",
+      "rotation": 0,
+      "source_geometry_sha256": "95addb58d779b354ccba8d1edd77a150c55945408f7eca16476c81d15399bc26"
+    },
+    "21|Stair_Interior": {
+      "family": "stair_type_A",
+      "reference_key": "tiles/stair_type_A",
+      "rotation": 0,
+      "source_geometry_sha256": "7da606dc7ea24668d6be4120c1aa996bcb9855d96dcda2bfc63c07045221a37f"
+    },
+    "22|Stair_Approach": {
+      "family": "stair_type_C",
+      "reference_key": "tiles/stair_type_C",
+      "rotation": 0,
+      "source_geometry_sha256": "8f05faeb88a9d9adfd0d749a5c54bad4135350d74d32dcef5bad10619ff0a3ea"
+    },
+    "23|Internal_Walls": {
+      "family": "wall_interior_8h",
+      "reference_key": "tiles/wall_interior_8h",
+      "rotation": 0,
+      "source_geometry_sha256": "7f4e689d02b3a1f1b4da4f7eaa111429dd9e88f56b049436cd5aeb8e0148abd0"
+    },
+    "24|Internal_Walls": {
+      "family": "wall_interior_8h",
+      "reference_key": "tiles/wall_interior_8h",
+      "rotation": 0,
+      "source_geometry_sha256": "45d2cf940f091b108773342070e63c38acedb3f4dc005606b7ddb6fccb1320ae"
+    },
+    "25|Internal_Walls": {
+      "family": "wall_full",
+      "reference_key": "tiles/wall_full",
+      "rotation": 1,
+      "source_geometry_sha256": "f16ac2268daa52338b60f07b5649a3e40ac226c6f87d6e572b4f31ea064ae089"
+    },
+    "25|Structure_Walls": {
+      "family": "wall_full",
+      "reference_key": "tiles/wall_full",
+      "rotation": 1,
+      "source_geometry_sha256": "f16ac2268daa52338b60f07b5649a3e40ac226c6f87d6e572b4f31ea064ae089"
+    },
+    "26|Internal_Walls": {
+      "family": "wall_full",
+      "reference_key": "tiles/wall_full",
+      "rotation": 1,
+      "source_geometry_sha256": "f9db162018bd13dfd9165eca706950cf435c9ccb510e73a0e1d8afe97abae970"
+    },
+    "26|Structure_Walls": {
+      "family": "wall_full",
+      "reference_key": "tiles/wall_full",
+      "rotation": 1,
+      "source_geometry_sha256": "f9db162018bd13dfd9165eca706950cf435c9ccb510e73a0e1d8afe97abae970"
+    },
+    "27|Internal_Walls": {
+      "family": "wall_corner_l",
+      "reference_key": "tiles/wall_corner_l",
+      "rotation": 0,
+      "source_geometry_sha256": "68c4fc1d18961ad65ed330d826f57904cfacacf4d2ca21ed79a08caa9cd0c2b2"
+    },
+    "28|Structure_Walls": {
+      "family": "wall_full",
+      "reference_key": "tiles/wall_full",
+      "rotation": 1,
+      "source_geometry_sha256": "f16ac2268daa52338b60f07b5649a3e40ac226c6f87d6e572b4f31ea064ae089"
+    },
+    "29|Structure_Walls": {
+      "family": "wall_full",
+      "reference_key": "tiles/wall_full",
+      "rotation": 1,
+      "source_geometry_sha256": "f9db162018bd13dfd9165eca706950cf435c9ccb510e73a0e1d8afe97abae970"
+    },
+    "30|Structure_Foundation": {
+      "family": "solid_cube",
+      "reference_key": "tiles/solid_cube",
+      "rotation": 0,
+      "source_geometry_sha256": "6725c97bddf5fc1f7323d38ee13bd7f9628177531f6de940977454a42cb15151"
+    },
+    "31|Structure_Foundation": {
+      "family": "solid_cube",
+      "reference_key": "tiles/solid_cube",
+      "rotation": 0,
+      "source_geometry_sha256": "47af7b3f548abeccaeff2b4c7354f1edf0ddf0a4438801f49d4b3d775cef21ae"
+    }
+  }
+}

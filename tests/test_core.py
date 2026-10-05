@@ -7,7 +7,7 @@ import json
 from vox_mixer.core import (
     Model, VoxScene, assign_link, build_links, choose_variants, chunk,
     export_scene, fitted_variant, load_project, load_tiles, project_path,
-    save_project, write_dict,
+    rotation_axes, save_project, write_dict,
 )
 
 
@@ -38,6 +38,38 @@ def tiny_vox(path: Path, models, shape_models, extra=b""):
 
 
 class MixerCoreTests(unittest.TestCase):
+    def test_vox_rotation_is_decoded_by_rows(self):
+        self.assertEqual(rotation_axes("17"), ((0, -1, 0), (1, 0, 0), (0, 0, 1)))
+        self.assertEqual(rotation_axes("33"), ((0, 1, 0), (-1, 0, 0), (0, 0, 1)))
+        # MagicaVoxel's format specification includes this full 3-axis example.
+        self.assertEqual(rotation_axes("105"), ((0, 1, 0), (0, 0, -1), (-1, 0, 0)))
+
+    def test_example_stairs_keep_scene_rotation_and_floor_height(self):
+        source = Path(__file__).resolve().parents[1] / "example" / "ruined_shop.vox"
+        scene = VoxScene.load(source)
+        stair = next(instance for instance in scene.instances
+                     if instance.layer == "Stair_Interior" and instance.origin == (95, 155, 21))
+        self.assertEqual(stair.axes, ((0, -1, 0), (1, 0, 0), (0, 0, 1)))
+        lower_z = stair.origin[2] - scene.models[stair.model_id].size[2] // 2
+        self.assertEqual(lower_z, 14)
+
+        with tempfile.TemporaryDirectory() as directory:
+            example = source.parent
+            links = [link for link in build_links(scene, load_tiles(example / "tiles"))
+                     if link.layer.startswith("Stair")]
+            choices, fitted, issues = choose_variants(scene, links, load_tiles(example / "tiles_damaged_A"),
+                                                       {"tiles_damaged_A": 100}, 42)
+            self.assertEqual(issues, [])
+            output = Path(directory) / "stairs_mixed.vox"
+            export_scene(scene, output, choices, fitted)
+            exported = VoxScene.load(output)
+            original_stairs = {item.shape_id: item for item in scene.instances if item.layer.startswith("Stair")}
+            mixed_stairs = {item.shape_id: item for item in exported.instances if item.layer.startswith("Stair")}
+            self.assertEqual(set(original_stairs), set(mixed_stairs))
+            for shape_id, original in original_stairs.items():
+                self.assertEqual((mixed_stairs[shape_id].origin, mixed_stairs[shape_id].axes),
+                                 (original.origin, original.axes))
+
     def test_shared_instances_can_receive_different_variants_without_losing_chunks(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

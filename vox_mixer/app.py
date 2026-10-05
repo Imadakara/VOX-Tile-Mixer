@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from collections import Counter
 from pathlib import Path
+import secrets
 import sys
 
-from PySide6.QtCore import Qt, QSettings
+from PySide6.QtCore import QPoint, Qt, QSettings
 from PySide6.QtWidgets import (
     QAbstractItemView, QApplication, QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFileDialog, QFormLayout,
-    QGroupBox, QHBoxLayout, QLabel, QMainWindow, QMessageBox, QPushButton,
-    QScrollArea, QSlider, QSpinBox, QSplitter, QTableWidget, QTableWidgetItem, QToolButton,
+    QGroupBox, QHeaderView, QHBoxLayout, QLabel, QMainWindow, QMenu, QMessageBox, QPushButton,
+    QScrollArea, QSizePolicy, QSlider, QSplitter, QTableWidget, QTableWidgetItem, QToolButton,
     QVBoxLayout, QWidget,
 )
 
@@ -25,9 +26,16 @@ QGroupBox { border: 1px solid #354154; border-radius: 8px; margin-top: 12px; pad
 QGroupBox::title { subcontrol-origin: margin; left: 12px; padding: 0 5px; }
 QPushButton { background: #28364b; border: 1px solid #40516a; border-radius: 6px; padding: 7px 11px; }
 QPushButton:hover { background: #344861; }
+QPushButton:pressed { background: #142238; border: 1px solid #87bdf2; padding: 8px 11px 6px 11px; }
 QPushButton:disabled { background: #222b38; color: #788395; }
 QPushButton#primary { background: #3975b8; border-color: #5796d7; font-weight: 600; }
-QTableWidget, QScrollArea, QComboBox, QSpinBox { background: #202a39; border: 1px solid #354154; }
+QPushButton#primary:pressed { background: #204c7a; border-color: #b2d8ff; padding: 8px 11px 6px 11px; }
+QToolButton { background: #28364b; border: 1px solid #40516a; border-radius: 5px; padding: 4px 8px; }
+QToolButton:hover { background: #344861; }
+QToolButton:pressed, QToolButton:checked { background: #204c7a; border-color: #91c8ff; }
+QToolButton#menu_button { font: bold 11pt 'Segoe UI Symbol'; padding: 0; }
+QToolButton#menu_button::menu-indicator { image: none; width: 0px; }
+QTableWidget, QScrollArea, QComboBox { background: #202a39; border: 1px solid #354154; }
 QTableWidget { alternate-background-color: #263449; }
 QTableWidget::item { color: #e7edf7; }
 QHeaderView::section { background: #28364b; padding: 5px; border: 0; }
@@ -82,8 +90,23 @@ class MixerWindow(QMainWindow):
         self.fitted = {}
         self.sliders = {}
         self.mix_applied = False
+        self.mix_seed = None
         self.settings = QSettings("RC-survival", "VOX Tile Mixer")
-        settings_menu = self.menuBar().addMenu("Settings")
+        settings_menu = QMenu("Settings", self)
+        self.menu_container = QWidget()
+        menu_layout = QHBoxLayout(self.menu_container)
+        menu_layout.setContentsMargins(0, 0, 8, 0)
+        menu_layout.setSpacing(0)
+        self.menu_button = QToolButton(self.menu_container)
+        self.menu_button.setObjectName("menu_button")
+        self.menu_button.setFixedSize(28, 24)
+        self.menu_button.setText("☰")
+        self.menu_button.setToolTip("Settings")
+        self.menu_button.setAccessibleName("Settings")
+        self.menu_button.setMenu(settings_menu)
+        self.menu_button.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        menu_layout.addWidget(self.menu_button)
+        self.menuBar().setCornerWidget(self.menu_container, Qt.Corner.TopLeftCorner)
         horizontal = settings_menu.addAction("Invert horizontal drag")
         horizontal.setCheckable(True)
         horizontal.setChecked(self.settings.value("invert_horizontal", True, type=bool))
@@ -94,8 +117,8 @@ class MixerWindow(QMainWindow):
         vertical.toggled.connect(lambda value: self.set_axis_setting("vertical", value))
 
         left = QSplitter(Qt.Orientation.Vertical)
-        preview_box = QGroupBox("Model preview")
-        preview_layout = QVBoxLayout(preview_box)
+        self.preview_box = QGroupBox("Model preview")
+        preview_layout = QVBoxLayout(self.preview_box)
         actions = QHBoxLayout()
         self.open_button = QPushButton("＋  Open VOX model")
         self.open_button.clicked.connect(self.open_dialog)
@@ -109,27 +132,28 @@ class MixerWindow(QMainWindow):
         preview_layout.addWidget(self.viewport, 1)
         layer_row = QHBoxLayout()
         self.layer_toggle = QToolButton()
-        self.layer_toggle.setText("Layers ▸")
+        self.layer_toggle.setText("Layers ▾")
         self.layer_toggle.setCheckable(True)
         self.layer_toggle.toggled.connect(self.toggle_layers)
         layer_row.addWidget(self.layer_toggle)
+        self.clear_selection_button = QPushButton("Clear selection")
+        self.clear_selection_button.setEnabled(False)
+        layer_row.addWidget(self.clear_selection_button)
         layer_row.addStretch()
         self.highlight_label = QLabel("")
         layer_row.addWidget(self.highlight_label)
         preview_layout.addLayout(layer_row)
-        self.layer_panel = QScrollArea()
+        self.layer_panel = QScrollArea(self.preview_box)
         self.layer_panel.setWidgetResizable(True)
-        self.layer_panel.setMaximumHeight(150)
         self.layer_panel.setVisible(False)
         self.layer_content = QWidget()
         self.layer_list = QVBoxLayout(self.layer_content)
         self.layer_list.addStretch()
         self.layer_panel.setWidget(self.layer_content)
-        preview_layout.addWidget(self.layer_panel)
-        help_label = QLabel("Left drag: rotate  •  wheel: zoom  •  Settings: invert drag axes")
+        help_label = QLabel("Left drag: rotate  •  wheel: zoom  •  ☰: drag settings")
         help_label.setStyleSheet("color:#a6b5c8")
         preview_layout.addWidget(help_label)
-        left.addWidget(preview_box)
+        left.addWidget(self.preview_box)
 
         links_box = QGroupBox("Model → tile links")
         links_layout = QVBoxLayout(links_box)
@@ -137,11 +161,18 @@ class MixerWindow(QMainWindow):
         links_layout.addWidget(self.link_summary)
         self.link_table = QTableWidget(0, 6)
         self.link_table.setHorizontalHeaderLabels(["Model", "Layer", "Uses", "Canvas", "Linked tile / status", "Change"])
-        self.link_table.horizontalHeader().setStretchLastSection(True)
+        header = self.link_table.horizontalHeader()
+        header.setStretchLastSection(False)
+        for column in range(4):
+            header.setSectionResizeMode(column, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(5, QHeaderView.ResizeMode.Fixed)
+        header.resizeSection(5, 142)
         self.link_table.setAlternatingRowColors(True)
         self.link_table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.link_table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.link_table.itemSelectionChanged.connect(self.highlight_selected_link)
+        self.clear_selection_button.clicked.connect(self.link_table.clearSelection)
         links_layout.addWidget(self.link_table)
         left.addWidget(links_box)
         left.setSizes([570, 280])
@@ -185,17 +216,6 @@ class MixerWindow(QMainWindow):
         self.slider_layout.addStretch()
         self.slider_area.setWidget(self.slider_content)
         mix_layout.addWidget(self.slider_area, 1)
-        seed_row = QHBoxLayout()
-        seed_row.addWidget(QLabel("Seed"))
-        self.seed = QSpinBox()
-        self.seed.setRange(0, 2_147_483_647)
-        self.seed.setValue(42)
-        self.seed.valueChanged.connect(lambda _value: self.mark_mix_dirty())
-        seed_row.addWidget(self.seed)
-        reroll = QPushButton("New seed")
-        reroll.clicked.connect(lambda: self.seed.setValue(self.seed.value() + 1))
-        seed_row.addWidget(reroll)
-        mix_layout.addLayout(seed_row)
         self.share_label = QLabel("Original: 100%")
         self.share_label.setWordWrap(True)
         mix_layout.addWidget(self.share_label)
@@ -231,8 +251,13 @@ class MixerWindow(QMainWindow):
         self.settings.setValue(f"invert_{axis}", value)
 
     def toggle_layers(self, expanded):
+        if expanded:
+            anchor = self.layer_toggle.mapTo(self.preview_box, QPoint(0, 0))
+            height = min(160, max(80, anchor.y() - 70))
+            width = min(260, self.preview_box.width() - 30)
+            self.layer_panel.setGeometry(anchor.x(), anchor.y() - height - 6, width, height)
+            self.layer_panel.raise_()
         self.layer_panel.setVisible(expanded)
-        self.layer_toggle.setText("Layers ▾" if expanded else "Layers ▸")
 
     def refresh_layers(self):
         while self.layer_list.count() > 1:
@@ -250,7 +275,9 @@ class MixerWindow(QMainWindow):
             self.layer_list.insertWidget(self.layer_list.count() - 1, checkbox)
 
     def highlight_selected_link(self):
-        row = self.link_table.currentRow()
+        selected_rows = self.link_table.selectionModel().selectedRows()
+        row = selected_rows[0].row() if selected_rows else -1
+        self.clear_selection_button.setEnabled(row >= 0)
         if 0 <= row < len(self.links):
             link = self.links[row]
             count = sum(instance.model_id == link.model_id and instance.layer == link.layer
@@ -285,6 +312,7 @@ class MixerWindow(QMainWindow):
         self.choices = {}
         self.fitted = {}
         self.mix_applied = False
+        self.mix_seed = None
         self.refresh_link_table()
         saved = project_path(scene.path)
         if saved.exists():
@@ -308,7 +336,6 @@ class MixerWindow(QMainWindow):
                     else:
                         link.family = None
                         link.status = "unmatched"
-                self.seed.setValue(profile.get("seed", 42))
                 self.refresh_sliders(profile.get("weights", {}))
                 self.refresh_link_table()
                 self.mark_mix_dirty()
@@ -386,7 +413,8 @@ class MixerWindow(QMainWindow):
             remove = QPushButton("Remove")
             remove.setFixedWidth(72)
             remove.setStyleSheet("QPushButton { color:#ffcad0; background:#422733; border:1px solid #764353; "
-                                 "border-radius:5px; padding:3px; }")
+                                 "border-radius:5px; padding:3px; } "
+                                 "QPushButton:pressed { background:#25121e; border-color:#ffb8c1; padding-top:5px; }")
             remove.clicked.connect(lambda _checked=False, p=folder: self.remove_folder(p))
             line.addWidget(remove)
             column.addLayout(line)
@@ -468,7 +496,8 @@ class MixerWindow(QMainWindow):
         self.update_buttons()
 
     def refresh_link_table(self):
-        selected = self.link_table.currentRow()
+        selected_rows = self.link_table.selectionModel().selectedRows()
+        selected = selected_rows[0].row() if selected_rows else -1
         selected_key = ((self.links[selected].model_id, self.links[selected].layer)
                         if 0 <= selected < len(self.links) else None)
         self.link_table.blockSignals(True)
@@ -493,6 +522,8 @@ class MixerWindow(QMainWindow):
             line.setContentsMargins(4, 2, 4, 2)
             name = QLabel(link.reference_key or "—")
             name.setToolTip(link.reference_key or "No tile linked")
+            name.setMinimumWidth(0)
+            name.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred)
             line.addWidget(name, 1)
             plaque = QLabel(link.status)
             palette = {"unmatched": ("#5d2029", "#ffb8c1"),
@@ -506,7 +537,6 @@ class MixerWindow(QMainWindow):
             change = QPushButton("Link other…")
             change.clicked.connect(lambda _checked=False, i=row: self.change_link(i))
             self.link_table.setCellWidget(row, 5, change)
-        self.link_table.resizeColumnsToContents()
         self.link_table.blockSignals(False)
         if selected_key:
             for row, link in enumerate(self.links):
@@ -539,8 +569,10 @@ class MixerWindow(QMainWindow):
         if not self.scene or not self.links:
             return
         weights = {name: slider.value() for name, slider in self.sliders.items()}
+        next_seed = secrets.randbits(64)
+        self.mix_seed = next_seed if next_seed != self.mix_seed else next_seed ^ 1
         self.choices, self.fitted, issues = choose_variants(self.scene, self.links, self.variant_tiles,
-                                                            weights, self.seed.value())
+                                                            weights, self.mix_seed)
         self.viewport.set_mix(self.choices, self.fitted)
         self.mix_applied = True
         self.update_buttons()
@@ -586,10 +618,10 @@ class MixerWindow(QMainWindow):
             # from exactly those pixels instead of applying the recipe twice.
             exported_weights = {name: 0 for name in weights}
             save_project(project_path(output), exported, self.original_folder, self.variant_folders,
-                         exported_links, exported_weights, self.seed.value())
+                         exported_links, exported_weights, self.mix_seed)
             # Also preserve links for the input scene for a later return to this source.
             save_project(project_path(self.scene.path), self.scene, self.original_folder, self.variant_folders,
-                         self.links, weights, self.seed.value())
+                         self.links, weights, self.mix_seed)
             self.statusBar().showMessage(f"Exported {output.name} and its link file", 10000)
             QMessageBox.information(self, "Export complete", f"Saved:\n{output}\n{project_path(output)}")
         except Exception as exc:

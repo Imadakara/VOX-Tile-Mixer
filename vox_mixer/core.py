@@ -167,9 +167,9 @@ def rotation_axes(value: str):
         raise ValueError(f"Invalid VOX rotation: {value}")
     third = next(i for i in range(3) if i not in (first, second))
     axes = [[0, 0, 0] for _ in range(3)]
-    axes[first][0] = -1 if b & 16 else 1
-    axes[second][1] = -1 if b & 32 else 1
-    axes[third][2] = -1 if b & 64 else 1
+    axes[0][first] = -1 if b & 16 else 1
+    axes[1][second] = -1 if b & 32 else 1
+    axes[2][third] = -1 if b & 64 else 1
     return tuple(tuple(row) for row in axes)
 
 

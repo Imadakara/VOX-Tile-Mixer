@@ -41,8 +41,23 @@ class MixerUiTests(unittest.TestCase):
                 window.link_tiles()
                 self.assertEqual(window.links[0].status, "linked")
                 self.assertFalse(window.export_button.isEnabled())
+                self.assertEqual(window.menu_button.text(), "☰")
+                self.assertEqual((window.menu_button.width(), window.menu_button.height()), (28, 24))
+                self.assertEqual(window.menu_container.layout().contentsMargins().right(), 8)
+                self.assertFalse(hasattr(window, "seed"))
+                viewport_geometry = window.viewport.geometry()
+                layer_button_geometry = window.layer_toggle.geometry()
+                window.layer_toggle.setChecked(True)
+                self.assertFalse(window.layer_panel.isHidden())
+                self.assertEqual(window.viewport.geometry(), viewport_geometry)
+                self.assertEqual(window.layer_toggle.geometry(), layer_button_geometry)
+                window.layer_toggle.setChecked(False)
                 window.sliders[variant.name].setValue(100)
-                window.recalculate()
+                with patch("vox_mixer.app.secrets.randbits", side_effect=[123, 456]):
+                    window.recalculate()
+                    self.assertEqual(window.mix_seed, 123)
+                    window.recalculate()
+                    self.assertEqual(window.mix_seed, 456)
                 self.assertEqual(len(window.choices), 2)
                 self.assertTrue(window.export_button.isEnabled())
                 output = root / "mixed.vox"
@@ -56,6 +71,7 @@ class MixerUiTests(unittest.TestCase):
                 self.assertEqual(saved["weights"], {variant.name: 0})
                 window.link_table.selectRow(0)
                 self.assertEqual(window.viewport.selected_link, (0, "Structure_Walls"))
+                self.assertTrue(window.clear_selection_button.isEnabled())
                 window.sliders[variant.name].setValue(0)
                 self.assertFalse(window.export_button.isEnabled())
 
@@ -76,6 +92,11 @@ class MixerUiTests(unittest.TestCase):
                                                     QPointF(0, 0), QPointF(0, 0),
                                                     Qt.MouseButton.LeftButton, Qt.MouseButton.LeftButton,
                                                     Qt.KeyboardModifier.NoModifier))
+                self.assertEqual(viewport.selected_link, (0, "Structure_Walls"))
+                window.clear_selection_button.click()
+                self.assertIsNone(viewport.selected_link)
+                self.assertEqual(window.link_table.selectedItems(), [])
+                self.assertFalse(window.clear_selection_button.isEnabled())
                 viewport.mouseMoveEvent(QMouseEvent(QEvent.Type.MouseMove, QPointF(20, 20),
                                                    QPointF(20, 20), QPointF(20, 20),
                                                    Qt.MouseButton.NoButton, Qt.MouseButton.LeftButton,
